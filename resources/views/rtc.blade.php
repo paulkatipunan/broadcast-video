@@ -1,8 +1,13 @@
 <script src="https://rtcmulticonnection.herokuapp.com/dist/RTCMultiConnection.min.js"></script>
 <script src="https://rtcmulticonnection.herokuapp.com/socket.io/socket.io.js"></script>
-
+<style type="text/css">
+    video {
+        width: 150px;
+        height: 150px;
+    }
+</style>
 <button id="btn-open-room">Open Room</button>
-<button id="btn-join-room">Join Room</button><hr>
+<!-- <button id="btn-join-room">Join Room</button><hr> -->
 
 
 <div id="local-videos-container">
@@ -26,6 +31,11 @@ connection.session = {
     oneway: true,
 };
 
+connection.bandwidth = {
+    audio: 50,  // 50 kbps
+    video: 256 // 256 kbps
+};
+
 connection.sdpConstraints.mandatory = {
     OfferToReceiveAudio: true,
     OfferToReceiveVideo: true
@@ -35,11 +45,11 @@ connection.onstream = function(event) {
     document.body.appendChild( event.mediaElement );
 };
 
-connection.addStream({
-    audio: true,
-    video: true,
-    oneway: true
-});
+// connection.addStream({
+//     audio: true,
+//     video: true,
+//     oneway: true
+// });
 
 var predefinedRoomId = 'xxxxxx';
 
@@ -52,4 +62,6 @@ document.getElementById('btn-join-room').onclick = function() {
     this.disabled = true;
     connection.join( predefinedRoomId );
 };
+
+
 </script>

@@ -30,8 +30,22 @@ connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
 //     OfferToReceiveVideo: true
 // };
 
+// ask RTCMultiConnection to
+    // DO NOT capture any camera
+    // because we already have one
+connection.dontCaptureUserMedia = false;
 
-connection.join('xxxxxx');
+//check roo every 3 second in active the connet
+(function checkRoom() {
+    connection.checkPresence('xxxxxx', function(isRoomExist, roomid, error) {
+        if (isRoomExist === true) {
+            connection.join('xxxxxx');
+            return;
+        }
+
+        setTimeout(checkRoom, 3000); // recheck after every 3 seconds
+    });
+})();
 
 var localVideoContainer = document.getElementById('local-videos-container');
 // var remoteVideoContainer = document.getElementById('remote-videos-container');
