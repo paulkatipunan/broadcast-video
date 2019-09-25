@@ -58,3 +58,8 @@ Route::get('rtc', function() {
 Route::get('rcvr', function() {
     return view('rcvr');
 });
+
+
+Route::get('peer', function() {
+    return view('peerconnection');
+});
