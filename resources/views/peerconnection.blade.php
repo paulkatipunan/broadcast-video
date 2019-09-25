@@ -5,7 +5,7 @@
 </head>
 <body>
 		<script src="https://rtcmulticonnection.herokuapp.com/socket.io/socket.io.js"></script>
-		<script src="http://www.webrtc-experiment.com/socket.io/PeerConnection.js"></script>
+		<script src="https://www.webrtc-experiment.com/socket.io/PeerConnection.js"></script>
 
 		<script type="text/javascript">
 	
