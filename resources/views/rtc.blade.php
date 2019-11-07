@@ -84,13 +84,15 @@ document.getElementById('btn-join-room').onclick = function() {
 };
 
 
+
+
 var videosContainer = document.getElementById("videos-container") || document.body;
 var roomsList = document.getElementById('rooms-list');
 var screensharing = new Screen();
 var channel = location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
 var sender = Math.round(Math.random() * 999999999) + 999999999;
 // https://github.com/muaz-khan/WebRTC-Experiment/tree/master/socketio-over-nodejs
-var SIGNALING_SERVER = 'https://socketio-over-nodejs2.herokuapp.com:443/';
+var SIGNALING_SERVER = 'https://rtcmulticonnection.herokuapp.com:443/';
 io.connect(SIGNALING_SERVER).emit('new-channel', {
 channel: channel,
 sender: sender
@@ -111,6 +113,33 @@ return socket.on('message', callback);
 
 screensharing.onstream = function(e) {
     document.body.appendChild(e.video);
+};
+
+// on getting each new screen
+screensharing.onaddstream = function(media) {
+    media.video.id = media.userid;
+    var video = media.video;
+    videosContainer.insertBefore(video, videosContainer.firstChild);
+    rotateVideo(video);
+    var hideAfterJoin = document.querySelectorAll('.hide-after-join');
+    for(var i = 0; i < hideAfterJoin.length; i++) {
+        hideAfterJoin[i].style.display = 'none';
+    }
+    if(media.type === 'local') {
+        addStreamStopListener(media.stream, function() {
+            location.reload();
+        });
+    }
+};
+
+
+screensharing.onNumberOfParticipantsChnaged = function(numberOfParticipants) {
+    if(!screensharing.isModerator) return;
+    document.title = numberOfParticipants + ' users are viewing your screen!';
+    var element = document.getElementById('number-of-participants');
+    if (element) {
+        element.innerHTML = numberOfParticipants + ' users are viewing your screen!';
+    }
 };
 
 document.getElementById('share-screen').onclick = function() {
