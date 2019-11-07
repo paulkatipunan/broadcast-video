@@ -1,3 +1,5 @@
+<script src="https://cdn.webrtc-experiment.com/getScreenId.js"></script>
+<script src="https://cdn.webrtc-experiment.com/screen.js"></script>
 <script src="https://rtcmulticonnection.herokuapp.com/dist/RTCMultiConnection.min.js"></script>
 <script src="https://rtcmulticonnection.herokuapp.com/socket.io/socket.io.js"></script>
 <style type="text/css">
@@ -7,6 +9,7 @@
     }
 </style>
 <button id="btn-open-room">Open Room</button>
+<button id="share-screen">Open screeen</button>
 <!-- <button id="btn-join-room">Join Room</button><hr> -->
 
 
@@ -18,6 +21,23 @@
     
 </div>
 <script>
+var screen = new Screen(213); // argument is optional
+console.log(screen)
+// on getting local or remote streams
+screen.onstream = function(e) {
+    document.body.appendChild(e.video);
+};
+
+// check pre-shared screens
+// it is useful to auto-view
+// or search pre-shared screens
+screen.check();
+
+document.getElementById('share-screen').onclick = function() {
+    alert();
+    screen.share();
+};
+
 var connection = new RTCMultiConnection();
 
 // this line is VERY_important
@@ -37,26 +57,11 @@ connection.bandwidth = {
 };
 
 connection.sdpConstraints.mandatory = {
-    chromeMediaSource: 'desktop',
-    maxWidth: 1920,
-    maxHeight: 1080,
-    maxFrameRate: 10
-    minAspectRatio: 1.77
-    chromeMediaSourceId: sourceId 
+    OfferToReceiveAudio: true,
+    OfferToReceiveVideo: true
 };
 
-// constraints = { 
-//       video: {
-//           mandatory: {
-//             chromeMediaSource: 'desktop',
-//             maxWidth: 1920,
-//             maxHeight: 1080,
-//             maxFrameRate: 10
-//             minAspectRatio: 1.77
-//             chromeMediaSourceId: sourceId         
-//           }
-//       }};
-      
+
 connection.onstream = function(event) {
     document.body.appendChild( event.mediaElement );
 };
