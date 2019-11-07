@@ -39,7 +39,7 @@ Route::get('marker-shape', function() {
 	return view('markerShape');
 });
 
-    Route::get('video-call', function() {
+    Route::get('share', function() {
         return view('videoCall');
     });
 

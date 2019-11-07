@@ -1,169 +1,137 @@
+
 <!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-    <meta name="description" content="WebRTC code samples">
-    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
-    <meta itemprop="description" content="Client-side WebRTC code samples">
-    <meta itemprop="image" content="../../../images/webrtc-icon-192x192.png">
-    <meta itemprop="name" content="WebRTC code samples">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta id="theme-color" name="theme-color" content="#ffffff">
+<html lang="en">
+    <head>
+        <title>WebRTC Screen Sharing</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <link rel="author" type="text/html" href="https://plus.google.com/+MuazKhan">
+        <meta name="author" content="Muaz Khan">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <base target="_blank">
+        <link rel="stylesheet" href="https://www.webrtc-experiment.com/style.css">
 
-    <title>getUserMedia + CSS filters</title>
+        <style>
+            video {
+                -moz-transition: all 1s ease;
+                -ms-transition: all 1s ease;
+                -o-transition: all 1s ease;
+                -webkit-transition: all 1s ease;
+                transition: all 1s ease;
+                vertical-align: top;
+                width: 100%;
+            }
+            input {
+                border: 1px solid #d9d9d9;
+                border-radius: 1px;
+                font-size: 2em;
+                margin: .2em;
+                width: 30%;
+            }
+            select {
+                border: 1px solid #d9d9d9;
+                border-radius: 1px;
+                height: 50px;
+                margin-left: 1em;
+                margin-right: -12px;
+                padding: 1.1em;
+                vertical-align: 6px;
+                width: 18%;
+            }
+            .setup {
+                border-bottom-left-radius: 0;
+                border-top-left-radius: 0;
+                font-size: 102%;
+                height: 47px;
+                margin-left: -9px;
+                margin-top: 8px;
+                position: absolute;
+            }
+            p { padding: 1em; }
+            li {
+                border-bottom: 1px solid rgb(189, 189, 189);
+                border-left: 1px solid rgb(189, 189, 189);
+                padding: .5em;
+            }
+        </style>
 
-    <link href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">
-    <style>
-        .none {
-            -webkit-filter: none;
-            filter: none;
-        }
+        <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/ajhifddimkapgcifgcodmmfdlknahffk">
 
-        .blur {
-            -webkit-filter: blur(3px);
-            filter: blur(3px);
-        }
+        <!-- scripts used for screen-sharing -->
+        <script src="https://www.webrtc-experiment.com/socket.io.js"> </script>
+        <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+        <script src="https://www.webrtc-experiment.com/IceServersHandler.js"></script>
+        <script src="https://www.webrtc-experiment.com/getScreenId.js"> </script>
+        <script src="https://www.webrtc-experiment.com/CodecsHandler.js"></script>
+        <script src="https://www.webrtc-experiment.com/BandwidthHandler.js"></script>
+        <script src="https://www.webrtc-experiment.com/screen.js"> </script>
+    </head>
 
-        .grayscale {
-            -webkit-filter: grayscale(1);
-            filter: grayscale(1);
-        }
+    <body>
+        <article>
+            
 
-        .invert {
-            -webkit-filter: invert(1);
-            filter: invert(1);
-        }
+            <!-- just copy this <section> and next script -->
+            <section class="experiment">
+                <section class="hide-after-join">
+                    <span>
+                        Private ?? <a href="/screen-sharing/" target="_blank" title="Open this link for private screen sharing!"><code><strong id="unique-token">#123456789</strong></code></a>
+                    </span>
+                    <input type="text" id="user-name" placeholder="Your Name">
+                    <button id="share-screen" class="setup">Share Your Screen</button>
+                </section>
 
-        .sepia {
-            -webkit-filter: sepia(1);
-            filter: sepia(1);
-        }
+                <!-- list of all available broadcasting rooms -->
+                <table style="width: 100%;" id="rooms-list" class="hide-after-join"></table>
 
-        button#snapshot {
-            margin: 0 10px 25px 0;
-            width: 110px;
-        }
+                <!-- local/remote videos container -->
+                <div id="videos-container"></div>
+            </section>
 
-        video {
-            object-fit: cover;
-        }
-    </style>
-</head>
-<body>
-    <div id="container">
+            <script>
+                // Muaz Khan     - https://github.com/muaz-khan
+                // MIT License   - https://www.webrtc-experiment.com/licence/
+                // Documentation - https://github.com/muaz-khan/WebRTC-Experiment/tree/master/screen-sharing
+                var videosContainer = document.getElementById("videos-container") || document.body;
+                var roomsList = document.getElementById('rooms-list');
+                var screensharing = new Screen();
+                var channel = location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
+                var sender = Math.round(Math.random() * 999999999) + 999999999;
+                // https://github.com/muaz-khan/WebRTC-Experiment/tree/master/socketio-over-nodejs
+                var SIGNALING_SERVER = 'https://socketio-over-nodejs2.herokuapp.com:443/';
+                io.connect(SIGNALING_SERVER).emit('new-channel', {
+                    channel: channel,
+                    sender: sender
+                });
+                var socket = io.connect(SIGNALING_SERVER + channel);
+                socket.on('connect', function () {
+                    // setup peer connection & pass socket object over the constructor!
+                });
+                socket.send = function (message) {
+                    socket.emit('message', {
+                        sender: sender,
+                        data: message
+                    });
+                };
+                screensharing.openSignalingChannel = function(callback) {
+                    return socket.on('message', callback);
+                };
+   
+                document.getElementById('share-screen').onclick = function() {
+                    var username = document.getElementById('user-name');
+                    username.disabled = this.disabled = true;
+                    screensharing.isModerator = true;
+                    screensharing.userid = username.value;
+                    screensharing.share();
+                };
+            
+                
+            </script>
 
-      <h1><a href="//webrtc.github.io/samples/" title="WebRTC samples homepage">WebRTC samples</a> <span>getUserMedia + CSS filters</span>
-      </h1>
-
-      <video playsinline autoplay></video>
-
-      <label for="filter">Filter: </label>
-      <select id="filter">
-          <option value="none">None</option>
-          <option value="blur">Blur</option>
-          <option value="grayscale">Grayscale</option>
-          <option value="invert">Invert</option>
-          <option value="sepia">Sepia</option>
-      </select>
-
-      <img src="" id="play">
-
-      <button id="snapshot">Take snapshot</button>
-        <button onclick="triggerEvent2()">button</button>
-      <canvas style="display: none;"></canvas>
-
-      <p>Draw a frame from the getUserMedia video stream onto the canvas element, then apply CSS filters.</p>
-
-      <p>The variables <code>canvas</code>, <code>video</code> and <code>stream</code> are in global scope, so you can
-          inspect them from the console.</p>
-
-      <a href="https://github.com/webrtc/samples/tree/gh-pages/src/content/getusermedia/filter"
-         title="View source for this page on GitHub" id="viewSource">View source on GitHub</a>
-  </div>
-
-  <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-  <script src="js/main.js" async></script>
-
-  <script src="../../../js/lib/ga.js"></script>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
-       
-	<script type="text/javascript">
-		/*
- *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree.
- */
-
-'use strict';
- 
-
-const snapshotButton = document.querySelector('button#snapshot');
-const filterSelect = document.querySelector('select#filter');
-
-// Put variables in global scope to make them available to the browser console.
-const video = window.video = document.querySelector('video');
-const canvas = window.canvas = document.querySelector('canvas');
-canvas.width = 480;
-canvas.height = 360;
-
-snapshotButton.onclick = function() {
-  canvas.className = filterSelect.value;
-  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-  var f=canvas.toDataURL();
-  console.log(f);
-};
-
-filterSelect.onchange = function() {
-  video.className = filterSelect.value;
-};
-
-const constraints = {
-  audio: false,
-  video: true
-};
-
-function handleSuccess(stream) {
-  window.stream = stream; // make stream available to browser console
-  video.srcObject = stream;
-}
-
-function handleError(error) {
-  console.log('navigator.MediaDevices.getUserMedia error: ', error.message, error.name);
-}
-
-navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError);
-
-
-function triggerEvent() {
-      socket.emit('fire', {mydata : 'test only'});
-
-}
-
-function triggerEvent2() {
-    setInterval(function(){
-      canvas.className = filterSelect.value;
-      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-      var f = canvas.toDataURL('image/webp');
-        socket.emit('channel-1', f);
-    }, 70);
-}
-
-const socket = io.connect('http://localhost:4000');
-    console.log('test---');
-  socket.on('userSet', function(data) {
-    var img = document.getElementById('play');
-    img.src = data;
-    console.log('-----');
-     console.log(data);
-     canvas.className = filterSelect.value;
-     canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-  });
-
-	</script>
-</body>
+            
+           
+        <!-- commits.js is useless for you! -->
+        <script src="https://www.webrtc-experiment.com/commits.js" async> </script>
+    </body>
 </html>

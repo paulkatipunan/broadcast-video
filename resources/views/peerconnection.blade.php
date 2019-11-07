@@ -1,76 +1,80 @@
-<!DOCTYPE html>
 <html>
-<head>
-	<title></title>
-</head>
-<body>
-		<script src="https://rtcmulticonnection.herokuapp.com/socket.io/socket.io.js"></script>
-		<script src="https://www.webrtc-experiment.com/socket.io/PeerConnection.js"></script>
 
-		<script type="text/javascript">
-	
-			var channel = location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
-			var sender = Math.round(Math.random() * 999999999) + 999999999;
+<head>            
 
-			// var SIGNALING_SERVER = 'https://socketio-over-nodejs2.herokuapp.com:443/';
-			var SIGNALING_SERVER = 'https://rtcmulticonnection.herokuapp.com:443/';
-			io.connect(SIGNALING_SERVER).emit('new-channel', {
-			    channel: channel,
-			    sender: sender
-			});
+           <title>Video  Chat</title>                  
 
-			var socket = io.connect(SIGNALING_SERVER + channel);
-			socket.send = function (message) {
-			    socket.emit('message', {
-			        sender: sender,
-			        data: message
-			    });
-			};
-				console.log(socket)
-			// pass "socket" object over the constructor instead of URL
-			var peer = new PeerConnection(socket);
+           <script         type="text/javascript"         src="device_dialog.js"></script>             
 
+          <script         type="text/javascript"         src="wow_feature.js"></script>             
 
-			function getUserMedia(callback) {
-			    var hints = {
-			        audio: true,
-			        video: {
-			            optional: [],
+           <script         type="text/javascript">
 
-			            // capture super-hd stream!
-			            mandatory: {
-			                minWidth: 1280,
-			                minHeight: 720,
-			                maxWidth: 1920,
-			                maxHeight: 1080,
-			                minAspectRatio: 1.77
-			            }
-			        }
-			    };
+                window.onload =         function () {
 
-			    navigator.getUserMedia(hints, function (stream) {
-			        //    you can use "peer.addStream" to attach stream
-			        //    peer.addStream(stream);
-			        // or peer.MediaStream = stream;
+                          var transceiver = new          MediaStreamTransceiver("ws://150.132.141.60:8880/delayswitch?sid=0");
 
-			        callback(stream);
+                                    var videoDevice = document.getElementsByTagName("device")[0];
 
-			        // preview local video
-			        var video = document.createElement('video');
-			        video.srcObject = stream;
-			        video.controls = true;
-			        video.muted = true;
+   
 
-			        peer.onStreamAdded({
-			            mediaElement: video,
-			            userid: 'self',
-			            stream: stream
-			        });
-			    });
-			}
+                                videoDevice.onchange = function (evt) {
 
-			</script>
-</body>
-</html>
+                                        var videoStream = videoDevice.data;
 
+                                        var selfView = document.getElementById("self_view");
+
+                                        // exclude audio from the self view
+
+                                        selfView.src = videoStream.url + "#video";
+
+                                        selfView.play();
+
+                                // set the stream to share
+
+                                        transceiver.localStream = videoStream;
+
+                                    };
+
+                            transceiver.onconnect = function () {
+
+                                        var remoteVideo =          document.getElementById("remote_video");
+
+                                     // play the incoming stream
+
+                                    remoteVideo.src = transceiver.remoteStream.url;
+
+                                    remoteVideo.play();
+
+                                    };
+
+                        }
+
+                     </script>             
+
+           </head>             
+
+         <body>             
+
+         <div><device         type="media"></div>             
+
+         <div         style="float:left">             
+
+         <p>Self-view:</p>     
+
+         <video         width="320"         height="240"         id="self_view"></video>             
+
+         </div>             
+
+         <div         style="float:left">             
+
+        <p>Remote          video:</p>     
+
+         <video         width="320"         height="240"         id="remote_video"></video>             
+
+         </div>            
+
+      </body>           
+
+      </html>
 
