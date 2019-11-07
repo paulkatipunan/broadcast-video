@@ -37,10 +37,26 @@ connection.bandwidth = {
 };
 
 connection.sdpConstraints.mandatory = {
-    OfferToReceiveAudio: true,
-    OfferToReceiveVideo: true
+    chromeMediaSource: 'desktop',
+    maxWidth: 1920,
+    maxHeight: 1080,
+    maxFrameRate: 10
+    minAspectRatio: 1.77
+    chromeMediaSourceId: sourceId 
 };
 
+// constraints = { 
+//       video: {
+//           mandatory: {
+//             chromeMediaSource: 'desktop',
+//             maxWidth: 1920,
+//             maxHeight: 1080,
+//             maxFrameRate: 10
+//             minAspectRatio: 1.77
+//             chromeMediaSourceId: sourceId         
+//           }
+//       }};
+      
 connection.onstream = function(event) {
     document.body.appendChild( event.mediaElement );
 };
