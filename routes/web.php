@@ -23,8 +23,8 @@ Route::get('data-pusher', function() {
 	return view('dataPusher');
 });
 
-Route::get('map', function() {
-	return view('vue-map');
+Route::get('privacy-policy', function() {
+	return view('privacy-policy');
 });
 
 Route::get('vue-map-private', function() {
