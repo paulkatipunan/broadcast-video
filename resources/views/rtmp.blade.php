@@ -29,5 +29,8 @@
         }
         });
     </script>
+    <div class="fb-login-button" data-size="small" data-button-type="continue_with" data-layout="default" data-auto-logout-link="false" data-use-continue-as="false" data-width=""></div>
+    <div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v7.0&appId=235115033766468&autoLogAppEvents=1" nonce="f3nVGu97"></script>
 </body>
 </html>
