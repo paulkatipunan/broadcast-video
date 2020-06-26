@@ -15,8 +15,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('pusher', function() {
-	return view('pusher');
+Route::get('rtmp', function() {
+	return view('rtmp');
 });
 
 Route::get('data-pusher', function() {
