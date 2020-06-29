@@ -60,6 +60,6 @@ Route::get('rcvr', function() {
 });
 
 
-Route::get('peer', function() {
-    return view('peerconnection');
+Route::get('video-broadcast', function() {
+    return view('videoBroadcast');
 });
