@@ -63,3 +63,7 @@ Route::get('rcvr', function() {
 Route::get('video-broadcast', function() {
     return view('videoBroadcast');
 });
+
+Route::get('video-rtmp', function() {
+    return view('video');
+});
