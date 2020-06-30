@@ -67,3 +67,11 @@ Route::get('video-broadcast', function() {
 Route::get('video-rtmp', function() {
     return view('video');
 });
+
+Route::get('video-player', function() {
+    return view('jsVideoPlayer');
+});
+
+Route::get('clappr', function() {
+    return view('clappr');
+});
