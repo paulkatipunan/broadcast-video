@@ -8,13 +8,13 @@
         <center>
         <h1>live streaming</h1>
         <video-js id="liveplayer" controls autoplay width=600 class="vjs-default-skin">
-            <source src="http://52.221.202.154/hls/test.m3u8" type="application/x-mpegURL">
+            <source src="http://52.221.202.154/hls/test123.m3u8" type="application/x-mpegURL">
         </video-js>
 
         <br><br>
 
         <video width=600 data-dashjs-player autoplay controls
-            src=http://52.221.202.154/dash/test.mpd></video>
+            src=http://52.221.202.154/dash/test123.mpd></video>
 
         </center>
 
